@@ -1,0 +1,4 @@
+blacklist nvidia
+blacklist nvidia-drm
+blacklist nvidia-uvm
+blacklist nvidia-modeset

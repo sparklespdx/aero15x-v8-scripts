@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=StartNouveau
+GenericName=StartNouveau
+Comment=Some description about your script
+Exec=/usr/bin/sudo modprobe nouveau
+Terminal=false
+Type=Application
+X-GNOME-Autostart-enabled=true
