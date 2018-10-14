@@ -12,9 +12,10 @@ fi
 # Reset git tree and apply Karol's patch
 # Only check out releases
 cd linux
+git reset --hard
 git fetch
 git checkout v$(uname -r | cut -d'.' -f1-2)
-patch -p1 < ../aero15x-scripts/nouveau-power.patch
+patch -p1 < ../nouveau-power.patch
 
 # Build nouveau and install module
 cd drivers/gpu/drm/nouveau
