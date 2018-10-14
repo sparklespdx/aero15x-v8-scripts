@@ -1,0 +1,130 @@
+From 08936d832bb3505d9431912d8be03796d71f55b1 Mon Sep 17 00:00:00 2001
+From: Karol Herbst <kherbst@redhat.com>
+Date: Fri, 31 Aug 2018 17:19:05 +0200
+Subject: [PATCH] enable PCIe link speed changes for pascal
+
+---
+ drivers/gpu/drm/nouveau/nvkm/subdev/pci/base.c  |  2 ++
+ drivers/gpu/drm/nouveau/nvkm/subdev/pci/gk104.c |  8 ++++----
+ drivers/gpu/drm/nouveau/nvkm/subdev/pci/gp100.c | 10 ++++++++++
+ drivers/gpu/drm/nouveau/nvkm/subdev/pci/pcie.c  |  8 ++++++++
+ drivers/gpu/drm/nouveau/nvkm/subdev/pci/priv.h  |  6 ++++++
+ 5 files changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/nouveau/nvkm/subdev/pci/base.c b/drivers/gpu/drm/nouveau/nvkm/subdev/pci/base.c
+index ee2431a7804ec..9fd71f795bf07 100644
+--- a/drivers/gpu/drm/nouveau/nvkm/subdev/pci/base.c
++++ b/drivers/gpu/drm/nouveau/nvkm/subdev/pci/base.c
+@@ -90,6 +90,8 @@ nvkm_pci_fini(struct nvkm_subdev *subdev, bool suspend)
+ 
+ 	if (pci->agp.bridge)
+ 		nvkm_agp_fini(pci);
++	else if (pci_is_pcie(pci->pdev))
++		nvkm_pcie_fini(pci);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/gpu/drm/nouveau/nvkm/subdev/pci/gk104.c b/drivers/gpu/drm/nouveau/nvkm/subdev/pci/gk104.c
+index e68030507d88b..664890185e155 100644
+--- a/drivers/gpu/drm/nouveau/nvkm/subdev/pci/gk104.c
++++ b/drivers/gpu/drm/nouveau/nvkm/subdev/pci/gk104.c
+@@ -23,7 +23,7 @@
+  */
+ #include "priv.h"
+ 
+-static int
++int
+ gk104_pcie_version_supported(struct nvkm_pci *pci)
+ {
+ 	return (nvkm_rd32(pci->subdev.device, 0x8c1c0) & 0x4) == 0x4 ? 2 : 1;
+@@ -108,7 +108,7 @@ gk104_pcie_lnkctl_speed(struct nvkm_pci *pci)
+ 	return -1;
+ }
+ 
+-static enum nvkm_pcie_speed
++enum nvkm_pcie_speed
+ gk104_pcie_max_speed(struct nvkm_pci *pci)
+ {
+ 	u32 max_speed = nvkm_rd32(pci->subdev.device, 0x8c1c0) & 0x300000;
+@@ -146,7 +146,7 @@ gk104_pcie_set_link_speed(struct nvkm_pci *pci, enum nvkm_pcie_speed speed)
+ 	nvkm_mask(device, 0x8c040, 0x1, 0x1);
+ }
+ 
+-static int
++int
+ gk104_pcie_init(struct nvkm_pci * pci)
+ {
+ 	enum nvkm_pcie_speed lnkctl_speed, max_speed, cap_speed;
+@@ -178,7 +178,7 @@ gk104_pcie_init(struct nvkm_pci * pci)
+ 	return 0;
+ }
+ 
+-static int
++int
+ gk104_pcie_set_link(struct nvkm_pci *pci, enum nvkm_pcie_speed speed, u8 width)
+ {
+ 	struct nvkm_subdev *subdev = &pci->subdev;
+diff --git a/drivers/gpu/drm/nouveau/nvkm/subdev/pci/gp100.c b/drivers/gpu/drm/nouveau/nvkm/subdev/pci/gp100.c
+index 82c5234a06ff5..eb19c7a445611 100644
+--- a/drivers/gpu/drm/nouveau/nvkm/subdev/pci/gp100.c
++++ b/drivers/gpu/drm/nouveau/nvkm/subdev/pci/gp100.c
+@@ -35,6 +35,16 @@ gp100_pci_func = {
+ 	.wr08 = nv40_pci_wr08,
+ 	.wr32 = nv40_pci_wr32,
+ 	.msi_rearm = gp100_pci_msi_rearm,
++
++	.pcie.init = gk104_pcie_init,
++	.pcie.set_link = gk104_pcie_set_link,
++
++	.pcie.max_speed = gk104_pcie_max_speed,
++	.pcie.cur_speed = g84_pcie_cur_speed,
++
++	.pcie.set_version = gf100_pcie_set_version,
++	.pcie.version = gf100_pcie_version,
++	.pcie.version_supported = gk104_pcie_version_supported,
+ };
+ 
+ int
+diff --git a/drivers/gpu/drm/nouveau/nvkm/subdev/pci/pcie.c b/drivers/gpu/drm/nouveau/nvkm/subdev/pci/pcie.c
+index d71e5db5028ab..b948488431765 100644
+--- a/drivers/gpu/drm/nouveau/nvkm/subdev/pci/pcie.c
++++ b/drivers/gpu/drm/nouveau/nvkm/subdev/pci/pcie.c
+@@ -105,12 +105,20 @@ nvkm_pcie_init(struct nvkm_pci *pci)
+ 	if (pci->func->pcie.init)
+ 		pci->func->pcie.init(pci);
+ 
++	nvkm_pcie_set_link(pci, NVKM_PCIE_SPEED_8_0, 16);
++
+ 	if (pci->pcie.speed != -1)
+ 		nvkm_pcie_set_link(pci, pci->pcie.speed, pci->pcie.width);
+ 
+ 	return 0;
+ }
+ 
++int
++nvkm_pcie_fini(struct nvkm_pci *pci)
++{
++	return nvkm_pcie_set_link(pci, NVKM_PCIE_SPEED_8_0, 16);
++}
++
+ int
+ nvkm_pcie_set_link(struct nvkm_pci *pci, enum nvkm_pcie_speed speed, u8 width)
+ {
+diff --git a/drivers/gpu/drm/nouveau/nvkm/subdev/pci/priv.h b/drivers/gpu/drm/nouveau/nvkm/subdev/pci/priv.h
+index c17f6063c9ea6..9820161722ce6 100644
+--- a/drivers/gpu/drm/nouveau/nvkm/subdev/pci/priv.h
++++ b/drivers/gpu/drm/nouveau/nvkm/subdev/pci/priv.h
+@@ -54,6 +54,12 @@ int gf100_pcie_cap_speed(struct nvkm_pci *);
+ int gf100_pcie_init(struct nvkm_pci *);
+ int gf100_pcie_set_link(struct nvkm_pci *, enum nvkm_pcie_speed, u8);
+ 
++int  gk104_pcie_init(struct nvkm_pci *);
++int  gk104_pcie_set_link(struct nvkm_pci *, enum nvkm_pcie_speed, u8 width);
++enum nvkm_pcie_speed gk104_pcie_max_speed(struct nvkm_pci *);
++int gk104_pcie_version_supported(struct nvkm_pci *);
++
+ int nvkm_pcie_oneinit(struct nvkm_pci *);
+ int nvkm_pcie_init(struct nvkm_pci *);
++int nvkm_pcie_fini(struct nvkm_pci *);
+ #endif
+
