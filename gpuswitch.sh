@@ -19,7 +19,7 @@ x11_nvidia () {
 	fi
 
 	if [[ -f "/home/josh/.config/autostart/nouveau.desktop" ]]; then
-		mv /home/josh/.config/autostart/nouveau.desktop /home/josh/.config/autostart/nouveau.desktop.disabled
+		mv ~/.config/autostart/nouveau.desktop ~/.config/autostart/nouveau.desktop.disabled
 	fi
 
 	if [[ -f "/etc/modprobe.d/blacklist-nvidia.conf" ]]; then
@@ -44,7 +44,7 @@ x11_intel () {
 	fi
 
 	if [[ -f "/home/josh/.config/autostart/nouveau.desktop.disabled" ]]; then
-		mv /home/josh/.config/autostart/nouveau.desktop.disabled /home/josh/.config/autostart/nouveau.desktop
+		mv ~/.config/autostart/nouveau.desktop.disabled ~/.config/autostart/nouveau.desktop
 	fi
 
 	if [[ -f "/etc/modprobe.d/blacklist-nvidia.disabled" ]]; then

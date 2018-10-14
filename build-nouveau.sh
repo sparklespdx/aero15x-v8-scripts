@@ -10,20 +10,20 @@ if [ ! -d ./linux ]; then
 fi
 
 # Reset git tree and apply Karol's patch
+# Only check out releases
 cd linux
-git reset --hard
+git fetch
 git checkout v$(uname -r | cut -d'.' -f1-2)
 patch -p1 < ../aero15x-scripts/nouveau-power.patch
 
 # Build nouveau and install module
 cd drivers/gpu/drm/nouveau
-make -C /lib/modules/$(uname -r)/build M=$(pwd) clean
-make -j6 -C /lib/modules/$(uname -r)/build M=$(pwd) modules
-sudo make -C /lib/modules/$(uname -r)/build M=$(pwd) modules_install
-make -C /lib/modules/$(uname -r)/build M=$(pwd) clean
+make -C /lib/modules/$(uname -r)/build M=$(pwd) clean && \
+make -j6 -C /lib/modules/$(uname -r)/build M=$(pwd) modules && \
+sudo make -C /lib/modules/$(uname -r)/build M=$(pwd) modules_install && \
+make -C /lib/modules/$(uname -r)/build M=$(pwd) clean && \
 
-# Remove module installed by Fedora kernel package
-# (can reinstall with `dnf reinstall kernel-modules`)
+# Remove module installed by Fedora kernel package (can reinstall with `dnf reinstall kernel-modules`)
 sudo rm /lib/modules/$(uname -r)/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz
 
 cd $orig_dir
