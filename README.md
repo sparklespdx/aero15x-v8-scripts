@@ -1,10 +1,10 @@
-### Gigabyte Aero 15x v8 Notes and Scripts
+# Gigabyte Aero 15x v8 Notes and Scripts
 
 I have gotten this laptop to reliably run Linux with some workarounds and caveats. I am using Fedora 28 / Kernel version 4.18 with XWayland.
 
 The laptop has crappy ACPI support for Linux, including issues with powering down the dGPU and issues with the keyboard Fn keys. Other than that, it seems to work pretty well.
 
-##### dGPU / Optimus support
+### dGPU / Optimus support
 
 This laptop is plauged by ACPI power issues that result in hard kernel lockups without some workarounds. This is apparently a common problem with NVIDIA Optimus laptops that has persisted over the past 3 years.
 
@@ -34,7 +34,7 @@ Helper scripts:
 
 Since the NVIDIA docker runtime works so well on this system, I was going to attempt to pass a TTY to a Docker container and try an `nvidia-xrun`-style setup with X11 inside a container.
 
-###### Keyboard support
+### Keyboard support
 
 What works:
 * Normal keys and numpad
