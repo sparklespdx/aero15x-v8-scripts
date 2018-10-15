@@ -46,7 +46,7 @@ make -C /lib/modules/$(uname -r)/build M=$(pwd) clean &&
 cd $orig_dir &&
 
 if [ -f "/lib/modules/$(uname -r)/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz" ]; then
-	sudo mv /lib/modules/$(uname -r)/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz ./nouveau.ko.xz.orig
+	sudo mv /lib/modules/$(uname -r)/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz ./nouveau.ko.xz.orig-$(uname -r)
 fi &&
 
 echo 'Module installed.'
