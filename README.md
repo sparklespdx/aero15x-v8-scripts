@@ -6,7 +6,7 @@ The laptop has crappy ACPI support for Linux, including issues with powering dow
 
 ### dGPU / Optimus support
 
-This laptop is plauged by ACPI power issues that result in hard kernel lockups without some workarounds. This is apparently a common problem with NVIDIA Optimus laptops that has persisted over the past 3 years.
+This laptop is plauged by ACPI power issues that result in hard kernel lockups without some workarounds. This is apparently a common problem with NVIDIA Optimus laptops that has persisted over the past 2 years.
 
 For details on this problem, [this bug report for nouveau](https://bugzilla.kernel.org/show_bug.cgi?id=156341) is the best source of information.
 
@@ -24,11 +24,16 @@ What doesn't work:
 * `bumblebee` doesn't work because of the dependency on `bbswitch`.
 
 Caveats:
-* Booting with either `nouveau` or `nvidia` loaded makes it hard to unload the modules later, even if the user logs out and logs back in. To get around this, I blacklist the modules at boot time during normal operation. If `noveau` is the active module, we load it using GDM auto-start. This requires an edit to `/etc/sudoers` that allows wheel members to load nouveau without a password.
+* Booting with either `nouveau` or `nvidia` loaded makes it hard to unload the modules later, even if the user logs out and logs back in. To get around this, I blacklist the modules at boot time if I want to use the Intel graphics for the primary display. We load `noveau` using GDM auto-start instead of at boot time, preventing XWayland from grabbing it and using it to render the screen, so we can display things with Intel and `nouveau` can turn the card off. **This requires an edit to `/etc/sudoers` that allows wheel members to load nouveau without a password.** Something like:
+
+```
+%wheel	ALL=(ALL)	NOPASSWD: /usr/sbin/modprobe nouveau
+```
+
 * On the flipside of this issue, in order to use the `nvidia` module to drive the primary display, the modules must be loaded at boot time. In order to disable the card after starting up this way, a reboot is required.
 
 Helper scripts:
-* `build-nouveau.sh`: This script will download the Linux kernel from git.kernel.org, patch it with Karol's power management workaround, build it against your running kernel, and install the new module.
+* `build-nouveau.sh`: This script will download the Linux kernel from git.kernel.org, patch the `nouveau` module with Karol's power management workaround, build it against your running kernel, and install the new module.
 * `gpuswitch.sh`: Loads and unloads modules and shuffles the config files around to turn the dGPU on or off.
 * `gpuswitch-configs`: Config files that `gpuswitch.sh` uses, please read it to figure out where they go.
 
