@@ -41,11 +41,28 @@ Since the NVIDIA docker runtime works so well on this system, I was going to att
 
 ### Keyboard support
 
+The keyboard sends out sensible HID codes for the Fn volume controls and Sleep button,
+but the scan codes for the other buttons do not follow the HID standard as I understand it.
+They (mostly) do not fire events on key release and the format of the scan codes doesn't
+conform to the HID documentation. The usbhid driver doesn't know what to do with the messages
+and drops them on the floor; we don't even see "unknown key" messages in `dmesg`. We can only
+see them if we record the raw messages from the kernel using `/dev/hidraw`.
+
+What's even weirder is that the Volume keys fire normal HID events AND these non-standard events.
+They are also the only keys that fire a key press and key release in the non-standard format.
+It's possible these are WMI events, but the keys don't do anything in Windows either. I don't know
+much about WMI and I am exploring this further; if possible I would like to add support in the kernel.
+
+Until the driver is working, I have done some hacky stuff with hid-record, awk and bash to get Fn-key
+support working for my use cases. I've also documented the nonstandard scan codes and mapped them to
+their keys. See `hotkeys.sh` for details.
+
 What works:
 * Normal keys and numpad
+* Break, Insert, PrtScr
 * Volume Control Fn keys (F7 - F9)
 * Sleep Fn key (F1)
+* Sniffing /dev/hidraw and doing hacky things for the other hotkeys
 
 What doesn't work:
-* Any of the other Fn keys, including screen brightness. FWIW these don't work on Windows either without the stupid Gigabyte Smart Manager software. Some reverse engineering could probably be done to figure this out, maybe sniff ACPI events or unpack the Smart Manager binary.
-* Backlight controls, including brightness. The settings from the last time the machine was booted carry over, so you can change the backlight in Windows and it will stay wherever you left it. I may work on reverse engineering Smart Manager to figure out how to do this.
+* Natve support in usbhid driver for most of the Fn hotkeys.
