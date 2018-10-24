@@ -50,6 +50,6 @@ if [ -f "/lib/modules/$(uname -r)/kernel/drivers/gpu/drm/nouveau/nouveau.ko.xz" 
 fi &&
 
 # Sign kernel module with MOK for secure boot
-sudo sh -c "/root/sign-module /lib/modules/$(uname -r)/extra/nouveau.ko"
+# sudo sh -c "/root/sign-module /lib/modules/$(uname -r)/extra/nouveau.ko"
 
 echo 'Module installed.'
