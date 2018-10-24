@@ -6,7 +6,7 @@
 # I'm not sure if it's possible given that most of the keys that I care about
 # (brightness controls, airplane mode, fan toggle) don't seem to register
 # key releases; only key presses. The keyboard seems to be using a custom
-# HID implementation for these keys, the codes don't follow the standard.
+# implementation for these keys, the codes don't follow the HID standard.
 # I will document this behavior further in the README.
 
 # To tide me over while I work on the driver, I am sniffing the HID events 
@@ -15,6 +15,7 @@
 
 
 # Keycode reference
+
 # [root@lappy-mk5 ~]# hid-recorder /dev/hidraw2
 # D: 0
 # R: 205 05 01 09 02 a1 01 85 01 09 01 a1 00 05 09 15 00 25 01 19 01 29 05 75 01 95 05 81 02 95 03 81 01 05 01 16 01 80 26 ff 7f 09 30 09 31 75 10 95 02 81 06 15 81 25 7f 09 38 75 08 95 01 81 06 05 0c 0a 38 02 95 01 81 06 c0 c0 05 01 09 80 a1 01 85 02 19 81 29 83 15 00 25 01 75 01 95 03 81 02 95 05 81 01 c0 05 0c 09 01 a1 01 85 03 19 00 2a ff 07 15 00 26 ff 07 95 01 75 10 81 00 c0 06 02 ff 09 01 a1 01 85 04 15 00 26 ff 00 09 03 75 08 95 03 81 00 c0 05 01 09 06 a1 01 85 05 05 07 95 01 75 08 81 03 95 e8 75 01 15 00 25 01 05 07 19 00 29 e7 81 00 c0 05 01 09 02 a1 01 85 06 15 00 26 ff 7f 09 30 09 31 75 10 95 02 81 02 c0
@@ -25,7 +26,7 @@
 # E: 1.048400 4 04 00 00 84	Fn + Esc, "Fan button" press (no signal for release)
 # E: 59.807566 2 02 02		Fn + F1, Sleep press	
 # E: 59.942351 2 02 00		Fn + F1, Sleep release
-# E: 210.391313 4 04 00 00 7c	Fn + F2, Wifi press (no signal for release
+# E: 210.391313 4 04 00 00 7c	Fn + F2, Wifi press (no signal for release)
 # E: 241.926536 4 04 00 00 7d	Fn + F3, Brightness Down press (no signal for release)
 # E: 242.990502 4 04 00 00 7e	Fn + F4, Brightness Up press (no signal for release)
 # 				No signal for Fn + F5
@@ -50,6 +51,7 @@
 
 # E: 103.657585 4 04 00 00 81	Fn + F10, A key in a box (no signal for release)
 # E: 149.248696 4 04 00 00 82	Fn + F11, Airplane Mode press (no signal for release)
+# E: 0.000000   4 04 00 00 83	Fn + F12, no button graphic but fires a code anyway (no signal for release)
 
 
 notify_josh () {
