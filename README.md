@@ -53,6 +53,17 @@ They are also the only keys that fire a key press and key release in the non-sta
 It's possible these are WMI events, but the keys don't do anything in Windows either. I don't know
 much about WMI and I am exploring this further; if possible I would like to add support in the kernel.
 
+The only keys that work in Windows are the Volume keys, the Sleep key, and the Fn + F5 key which
+brings up a display control panel. Fn + F5 doesen't show up on /dev/hidraw in linux, though I can
+see the keyboard is sending messages over the USB bus.
+
+The only vendor-supported way to get these keys working in Windows is to run the Gigabyte
+"Smart Manager" software. It's buggy and terrible. I unpacked the exe and it comes with it's
+own DLLs... how fun! I may reverse engineer this software further.
+
+The other functionality that is missing is the LED control. I think the most direct way to go about this would be to
+hook up the control software to a debugger.
+
 Until the driver is working, I have done some hacky stuff with hid-record, awk and bash to get Fn-key
 support working for my use cases. I've also documented the nonstandard scan codes and mapped them to
 their keys. See `hotkeys.sh` for details.
@@ -66,3 +77,4 @@ What works:
 
 What doesn't work:
 * Natve support in usbhid driver for most of the Fn hotkeys.
+* Controlling the lights.
