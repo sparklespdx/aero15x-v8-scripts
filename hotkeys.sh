@@ -60,23 +60,23 @@ notify_josh () {
 
 raise_brightness () {
 	brightness=$(cat /sys/class/backlight/intel_backlight/brightness)
-	if [[ $brightness -gt 108000 ]]; then
-		echo 120000 > /sys/class/backlight/intel_backlight/brightness
+	if [[ $brightness -gt 102000 ]]; then
+		echo 180000 > /sys/class/backlight/intel_backlight/brightness
 	elif [[ $brightness -eq 0 ]]; then
 		echo 1 > /sys/class/backlight/intel_backlight/brightness
 	else
-		echo $(($brightness + 12000)) > /sys/class/backlight/intel_backlight/brightness
+		echo $(($brightness + 18000)) > /sys/class/backlight/intel_backlight/brightness
 	fi
 }
 
 lower_brightness () {
 	brightness=$(cat /sys/class/backlight/intel_backlight/brightness)
-	if [[ $brightness -lt 12000 && $brightness -gt 1 ]]; then
+	if [[ $brightness -lt 18000 && $brightness -gt 1 ]]; then
 		echo 1 > /sys/class/backlight/intel_backlight/brightness
 	elif [[ $brightness -eq 1 ]]; then
 		echo 0 > /sys/class/backlight/intel_backlight/brightness
 	else
-		echo $(($brightness - 12000)) > /sys/class/backlight/intel_backlight/brightness
+		echo $(($brightness - 18000)) > /sys/class/backlight/intel_backlight/brightness
 	fi
 }
 
