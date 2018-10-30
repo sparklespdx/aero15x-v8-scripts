@@ -59,11 +59,21 @@ notify_josh () {
 }
 
 raise_brightness () {
-	echo $(($(cat /sys/class/backlight/intel_backlight/brightness) + 24000)) > /sys/class/backlight/intel_backlight/brightness
+	brightness=$(cat /sys/class/backlight/intel_backlight/brightness)
+	if [[ $brightness -gt 108000 ]]; then
+		echo 120000 > /sys/class/backlight/intel_backlight/brightness
+	else
+		echo $(($brightness + 12000)) > /sys/class/backlight/intel_backlight/brightness
+	fi
 }
 
 lower_brightness () {
-	echo $(($(cat /sys/class/backlight/intel_backlight/brightness) - 24000)) > /sys/class/backlight/intel_backlight/brightness
+	brightness=$(cat /sys/class/backlight/intel_backlight/brightness)
+	if [[ $brightness -lt 12000 ]]; then
+		echo 0 > /sys/class/backlight/intel_backlight/brightness
+	else
+		echo $(($brightness - 12000)) > /sys/class/backlight/intel_backlight/brightness
+	fi
 }
 
 toggle_cpupower () {
