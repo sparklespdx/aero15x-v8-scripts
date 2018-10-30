@@ -61,7 +61,7 @@ notify_josh () {
 raise_brightness () {
 	brightness=$(cat /sys/class/backlight/intel_backlight/brightness)
 	if [[ $brightness -gt 102000 ]]; then
-		echo 180000 > /sys/class/backlight/intel_backlight/brightness
+		echo 120000 > /sys/class/backlight/intel_backlight/brightness
 	elif [[ $brightness -eq 0 ]]; then
 		echo 1 > /sys/class/backlight/intel_backlight/brightness
 	else
